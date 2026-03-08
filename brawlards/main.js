@@ -21,7 +21,12 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-document.getElementById('app').appendChild(renderer.domElement);
+const appDiv = document.getElementById('app');
+if (appDiv.children.length > 0) {
+    appDiv.insertBefore(renderer.domElement, appDiv.children[0]);
+} else {
+    appDiv.appendChild(renderer.domElement);
+}
 
 // ====================================
 // PHYSICS WORLD
@@ -280,37 +285,37 @@ function animate() {
 
 function updateUI() {
     const uiDiv = document.getElementById('ui');
-    if (!uiDiv.querySelector('.info-panel')) {
-        uiDiv.innerHTML = `
-            <div class="info-panel">
-                <h2>🎱 Brawlards</h2>
-                <p>Ball: ${ballSelected + 1}/${balls.length}</p>
-                <p>Power: ${(shootPower * 100).toFixed(0)}%</p>
-                <p>Velocity: ${stats.ballVelocity.toFixed(2)}</p>
-            </div>
-            <div class="stats">
-                <div>FPS: ${stats.fps}</div>
-                <div>Bodies: ${stats.ballCount}</div>
-            </div>
-            <div class="control-panel">
-                <h3>Controls</h3>
-                <p>← → : Select Ball</p>
-                <p>SPACE : Shoot</p>
-                <p>R : Reset</p>
-            </div>
-        `;
-    } else {
-        uiDiv.querySelector('.info-panel').innerHTML = `
-            <h2>🎱 Brawlards</h2>
-            <p>Ball: ${ballSelected + 1}/${balls.length}</p>
-            <p>Power: ${(shootPower * 100).toFixed(0)}%</p>
-            <p>Velocity: ${stats.ballVelocity.toFixed(2)}</p>
-        `;
-        uiDiv.querySelector('.stats').innerHTML = `
-            <div>FPS: ${stats.fps}</div>
-            <div>Bodies: ${stats.ballCount}</div>
-        `;
-    }
+    if (!uiDiv) return; // Nếu element không tồn tại, bỏ qua
+    
+    const infoPanel = uiDiv.querySelector('.info-panel') || createInfoPanel();
+    const statsDiv = uiDiv.querySelector('.stats') || createStatsDiv();
+    
+    infoPanel.innerHTML = `
+        <h2>🎱 Brawlards</h2>
+        <p>Ball: ${ballSelected + 1}/${balls.length}</p>
+        <p>Power: ${(shootPower * 100).toFixed(0)}%</p>
+        <p>Velocity: ${stats.ballVelocity.toFixed(2)}</p>
+    `;
+    statsDiv.innerHTML = `
+        <div>FPS: ${stats.fps}</div>
+        <div>Bodies: ${stats.ballCount}</div>
+    `;
+}
+
+function createInfoPanel() {
+    const uiDiv = document.getElementById('ui');
+    const panel = document.createElement('div');
+    panel.className = 'info-panel';
+    uiDiv.appendChild(panel);
+    return panel;
+}
+
+function createStatsDiv() {
+    const uiDiv = document.getElementById('ui');
+    const stats = document.createElement('div');
+    stats.className = 'stats';
+    uiDiv.appendChild(stats);
+    return stats;
 }
 
 // ====================================
